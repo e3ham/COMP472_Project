@@ -335,7 +335,7 @@ class Game:
         elif unit == UnitType.AI and Player == Player.Defender:
             return coords.src.row < coords.dst.row and coords.src.col <= coords.dst.col
         else:
-            return True
+            return coords.src.row != coords.dst.row or coords.src.col != coords.dst.col
 
         #return unit is None
 
