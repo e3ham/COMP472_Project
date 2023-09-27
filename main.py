@@ -157,7 +157,7 @@ class Coord:
         s = s.strip()
         for sep in " ,.:;-_":
             s = s.replace(sep, "")
-        if (len(s) == 2):
+        if len(s) == 2:
             coord = Coord()
             coord.row = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".find(s[0:1].upper())
             coord.col = "0123456789abcdef".find(s[1:2].lower())
@@ -208,7 +208,7 @@ class CoordPair:
         s = s.strip()
         for sep in " ,.:;-_":
             s = s.replace(sep, "")
-        if (len(s) == 4):
+        if len(s) == 4:
             coords = CoordPair()
             coords.src.row = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".find(s[0:1].upper())
             coords.src.col = "0123456789abcdef".find(s[1:2].lower())
@@ -334,12 +334,22 @@ class Game:
         if dst_unit is not None:
             return False
 
-        if src_unit.type == UnitType.AI and src_unit.player == Player.Attacker:
-            return coords.src.row > coords.dst.row and coords.src.col >= coords.dst.col
-        elif src_unit.type == UnitType.AI and src_unit.player == Player.Defender:
-            return coords.src.row < coords.dst.row and coords.src.col <= coords.dst.col
-        else:
-            return abs(coords.src.row - coords.dst.row) <= 1 and abs(coords.src.col - coords.dst.col) <= 1
+        # Check if AI, Firewall, or Program is engaged in combat
+        if src_unit.type in [UnitType.AI, UnitType.Firewall, UnitType.Program]:
+            for adj_coord in coords.src.iter_adjacent():
+                adj_unit = self.get(adj_coord)
+                if adj_unit and adj_unit.player != self.next_player:
+                    return False  # Engaged in combat, can't move
+
+        # Check movement restrictions for AI, Firewall, and Program
+        if src_unit.type in [UnitType.AI, UnitType.Firewall, UnitType.Program]:
+            if src_unit.player == Player.Attacker:
+                return coords.src.row >= coords.dst.row and coords.src.col >= coords.dst.col
+            else:  # Defender
+                return coords.src.row <= coords.dst.row and coords.src.col <= coords.dst.col
+
+        # Tech and Virus can move to adjacent cells
+        return coords.src.row != coords.dst.row or coords.src.col != coords.dst.col
 
     def perform_move(self, coords: CoordPair) -> Tuple[bool, str]:
         """Validate and perform a move expressed as a CoordPair. TODO: WRITE MISSING CODE!!!"""
