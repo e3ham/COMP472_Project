@@ -319,25 +319,27 @@ class Game:
             self.remove_dead(coord)
 
     def is_valid_move(self, coords: CoordPair) -> bool:
-        """Validate a move expressed as a CoordPair. TODO: WRITE MISSING CODE!!!"""
+        """Validate a move expressed as a CoordPair."""
         if not self.is_valid_coord(coords.src) or not self.is_valid_coord(coords.dst):
             return False
-        unit = self.get(coords.src)
-        if unit is None or unit.player != self.next_player:
-            return False
-        unit = self.get(coords.dst)
 
-        if unit is not None:
+        # Check if there is a unit at the source coordinate
+        src_unit = self.get(coords.src)
+
+        if src_unit is None or src_unit.player != self.next_player:
             return False
 
-        if unit == UnitType.AI and Player == Player.Attacker:
+        # Check if there is no unit at the destination coordinate
+        dst_unit = self.get(coords.dst)
+        if dst_unit is not None:
+            return False
+
+        if src_unit.type == UnitType.AI and src_unit.player == Player.Attacker:
             return coords.src.row > coords.dst.row and coords.src.col >= coords.dst.col
-        elif unit == UnitType.AI and Player == Player.Defender:
+        elif src_unit.type == UnitType.AI and src_unit.player == Player.Defender:
             return coords.src.row < coords.dst.row and coords.src.col <= coords.dst.col
         else:
-            return True
-
-        #return unit is None
+            return abs(coords.src.row - coords.dst.row) <= 1 and abs(coords.src.col - coords.dst.col) <= 1
 
     def perform_move(self, coords: CoordPair) -> Tuple[bool, str]:
         """Validate and perform a move expressed as a CoordPair. TODO: WRITE MISSING CODE!!!"""
