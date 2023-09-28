@@ -560,6 +560,26 @@ class Game:
             print(f"Broker error: {error}")
         return None
 
+    def attack(self, src_coord: Coord, dst_coord: Coord) -> Tuple[bool, str]:
+        """Perform an attack action from src_coord to dst_coord."""
+        src_unit = self.get(src_coord)
+        dst_unit = self.get(dst_coord)
+
+        if not self.is_valid_coord(src_coord) or not self.is_valid_coord(dst_coord):
+            return (False, "Invalid coordinates")
+
+        if src_unit is None or src_unit.player != self.next_player:
+            return (False, "Invalid source unit")
+
+        if dst_unit is None or dst_unit.player == self.next_player:
+            return (False, "Invalid target unit")
+
+        damage = src_unit.damage_amount(dst_unit)
+        self.mod_health(dst_coord, -damage)
+        self.mod_health(src_coord, -damage)
+
+        return (True, f"Attacked {dst_coord.to_string()} with {src_coord.to_string()}, damage: {damage}")
+
 
 ##############################################################################################################
 
