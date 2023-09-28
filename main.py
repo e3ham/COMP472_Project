@@ -420,23 +420,43 @@ class Game:
                 mv = self.get_move_from_broker()
                 if mv is not None:
                     (success, result) = self.perform_move(mv)
-                    print(f"Broker {self.next_player.name}: ", end='')
-                    print(result)
                     if success:
                         self.next_turn()
                         break
                 sleep(0.1)
         else:
             while True:
-                mv = self.read_move()
-                (success, result) = self.perform_move(mv)
-                if success:
-                    print(f"Player {self.next_player.name}: ", end='')
-                    print(result)
-                    self.next_turn()
-                    break
+                print(f"Player {self.next_player.name}, enter your move or attack (e.g., 'A1 B2'): ", end='')
+                move_input = input()
+                if move_input.lower() == "exit":
+                    exit()  # Allow the user to exit the game
+                elif "attack" in move_input.lower():
+                    attack_coords = move_input.split()[1:]
+                    if len(attack_coords) == 2:
+                        src_coord_str, dst_coord_str = attack_coords
+                        src_coord = Coord.from_string(src_coord_str)
+                        dst_coord = Coord.from_string(dst_coord_str)
+                        if src_coord and dst_coord:
+                            success, result = self.attack(src_coord, dst_coord)
+                            if success:
+                                print(result)
+                                self.next_turn()
+                                break
+                            else:
+                                print(result)
+                        else:
+                            print("Invalid coordinates provided for attack.")
+                    else:
+                        print("Invalid attack command format. Please provide coordinates in the format 'A1 B2'.")
                 else:
-                    print("The move is not valid! Try again.")
+                    mv = CoordPair.from_string(move_input)
+                    (success, result) = self.perform_move(mv)
+                    if success:
+                        print(result)
+                        self.next_turn()
+                        break
+                    else:
+                        print("The move is not valid! Try again.")
 
     def computer_turn(self) -> CoordPair | None:
         """Computer plays a move."""
@@ -565,16 +585,22 @@ class Game:
         src_unit = self.get(src_coord)
         dst_unit = self.get(dst_coord)
 
+        # Check if the source and destination coordinates are valid
         if not self.is_valid_coord(src_coord) or not self.is_valid_coord(dst_coord):
             return (False, "Invalid coordinates")
 
+        # Check if there is a unit at the source coordinate and it belongs to the current player
         if src_unit is None or src_unit.player != self.next_player:
             return (False, "Invalid source unit")
 
+        # Check if there is a unit at the destination coordinate and it belongs to the opposing player
         if dst_unit is None or dst_unit.player == self.next_player:
             return (False, "Invalid target unit")
 
+        # Calculate the damage inflicted by the source unit on the destination unit
         damage = src_unit.damage_amount(dst_unit)
+
+        # Modify the health of the target unit and the source unit based on the damage
         self.mod_health(dst_coord, -damage)
         self.mod_health(src_coord, -damage)
 
@@ -592,6 +618,7 @@ def main():
     parser.add_argument('--max_time', type=float, help='maximum search time')
     parser.add_argument('--game_type', type=str, default="manual", help='game type: auto|attacker|defender|manual')
     parser.add_argument('--broker', type=str, help='play via a game broker')
+    parser.add_argument('--attack', type=str, help='perform an attack in the format "A1 B2"')
     args = parser.parse_args()
 
     # parse the game type
