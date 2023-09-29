@@ -352,12 +352,24 @@ class Game:
         return coords.src.row != coords.dst.row or coords.src.col != coords.dst.col
 
     def perform_move(self, coords: CoordPair) -> Tuple[bool, str]:
-        """Validate and perform a move expressed as a CoordPair. TODO: WRITE MISSING CODE!!!"""
+        """Validate and perform a move expressed as a CoordPair."""
         if self.is_valid_move(coords):
             self.set(coords.dst, self.get(coords.src))
             self.set(coords.src, None)
-            return (True, "")
-        return (False, "invalid move")
+            return (True, f"Moved from {coords.src} to {coords.dst}")
+
+        # Check for valid attack if movement isn't valid.
+        src_unit = self.get(coords.src)
+        dst_unit = self.get(coords.dst)
+        if src_unit and dst_unit and src_unit.player != dst_unit.player:  # Ensure we have opposing units
+            success, message = self.attack(coords.src, coords.dst)
+            if success:
+                return (True, f"Attacked from {coords.src} to {coords.dst}")
+        elif src_unit.player == dst_unit.player:
+            success, message = self.repair(coords.src, coords.dst)
+            if success:
+                return (True, f"Repaired {coords.dst} using {coords.src}")
+        return (False, "invalid action")
 
     def next_turn(self):
         """Transitions game to the next turn."""
@@ -580,8 +592,7 @@ class Game:
             print(f"Broker error: {error}")
         return None
 
-    def attack(self, src_coord: Coord, dst_coord: Coord) -> Tuple[bool, str]:
-        """Perform an attack action from src_coord to dst_coord."""
+    def attack(self, src_coord, dst_coord):
         src_unit = self.get(src_coord)
         dst_unit = self.get(dst_coord)
 
@@ -638,6 +649,40 @@ class Game:
         self.mod_health(dst_coord, +repair)
 
         return (True, f"Repaired {dst_coord.to_string()} with {src_coord.to_string()}, repaired: {repair}")
+
+
+    def self_destruct(self, coord: Coord) -> Tuple[bool, str]:
+        """Perform a self-destruct action on the unit at the given coordinate."""
+        # Check if the coordinate is valid
+        if not self.is_valid_coord(coord):
+            return (False, "Invalid coordinate")
+
+        # Check if there is a unit at the coordinate
+        unit = self.get(coord)
+        if unit is None or unit.player != self.next_player:
+            return (False, "No unit or not your unit to self-destruct")
+
+        # Inflict damage to all surrounding units
+        for adj_coord in coord.iter_all_surrounding():
+            if self.is_valid_coord(adj_coord):
+                target_unit = self.get(adj_coord)
+                if target_unit:  # If there's a unit in the adjacent cell
+                    self.mod_health(adj_coord, -2)  # Inflict 2 points of damage
+
+        # Remove the unit that self-destructed
+        self.set(coord, None)
+
+        return (True, f"Unit at {coord.row, coord.col} self-destructed!")
+
+    def is_game_over(self) -> Tuple[bool, str]:
+        if not self._attacker_has_ai:
+            return (True, "Defender wins!")
+        if not self._defender_has_ai:
+            return (True, "Attacker wins!")
+        if self.turns_played >= 100:  # Assuming 100 as the limit
+            return (True, "Game over! Defender wins due to move limit!")
+        return (False, "")
+
 
 ##############################################################################################################
 
