@@ -151,6 +151,21 @@ class Coord:
         yield Coord(self.row + 1, self.col)
         yield Coord(self.row, self.col + 1)
 
+    def iter_all_surrounding(self):
+        """Generate all surrounding coordinates, including diagonals."""
+        directions = [
+            (-1, 0),  # Up
+            (1, 0),  # Down
+            (0, -1),  # Left
+            (0, 1),  # Right
+            (-1, -1),  # Up-left diagonal
+            (-1, 1),  # Up-right diagonal
+            (1, -1),  # Down-left diagonal
+            (1, 1)  # Down-right diagonal
+        ]
+        for dr, dc in directions:
+            yield Coord(self.row + dr, self.col + dc)
+
     @classmethod
     def from_string(cls, s: str) -> Coord | None:
         """Create a Coord from a string. ex: D2."""
@@ -353,22 +368,48 @@ class Game:
 
     def perform_move(self, coords: CoordPair) -> Tuple[bool, str]:
         """Validate and perform a move expressed as a CoordPair."""
+
+        print(f"Trying to perform action from {coords.src} to {coords.dst}")
+
+        # If it's a valid move
         if self.is_valid_move(coords):
+            print(f"Move from {coords.src} to {coords.dst} is valid")
             self.set(coords.dst, self.get(coords.src))
             self.set(coords.src, None)
             return (True, f"Moved from {coords.src} to {coords.dst}")
 
-        # Check for valid attack if movement isn't valid.
         src_unit = self.get(coords.src)
         dst_unit = self.get(coords.dst)
-        if src_unit and dst_unit and src_unit.player != dst_unit.player:  # Ensure we have opposing units
+
+        # Check if there's an actual unit at the source
+        if not src_unit:
+            return (False, "invalid action: No unit at source")
+
+        # If it's a self-destruct
+        if coords.src == coords.dst:
+            print(f"Attempting to self-destruct at {coords.src}")
+            affected_units = self.self_destruct(coords.src)
+            if affected_units:
+                affected_units_str = ', '.join([str(coord) for coord in affected_units])
+                return (True, f"Self-destructed at {coords.src}. Affected units: {affected_units_str}")
+            return (False, "Self-destruction failed")  # Explicitly specifying the failure reason
+
+        # If it's an attack
+        if dst_unit and src_unit.player != dst_unit.player:
+            print(f"Attempting to attack from {coords.src} to {coords.dst}")
             success, message = self.attack(coords.src, coords.dst)
             if success:
                 return (True, f"Attacked from {coords.src} to {coords.dst}")
-        elif src_unit.player == dst_unit.player:
+            return (False, message)  # Explicitly returning the error from attack method
+
+        # If it's a repair
+        if dst_unit and src_unit.player == dst_unit.player:
+            print(f"Attempting to repair {coords.dst} using {coords.src}")
             success, message = self.repair(coords.src, coords.dst)
             if success:
                 return (True, f"Repaired {coords.dst} using {coords.src}")
+            return (False, message)  # Explicitly returning the error from repair method
+
         return (False, "invalid action")
 
     def next_turn(self):
@@ -468,7 +509,7 @@ class Game:
                         self.next_turn()
                         break
                     else:
-                        print("The move is not valid! Try again.")
+                        print("The move is not valid! Try again!")
 
     def computer_turn(self) -> CoordPair | None:
         """Computer plays a move."""
@@ -650,8 +691,8 @@ class Game:
 
         return (True, f"Repaired {dst_coord.to_string()} with {src_coord.to_string()}, repaired: {repair}")
 
-
     def self_destruct(self, coord: Coord) -> Tuple[bool, str]:
+        print(f"Trying to self destruct at {coord}")
         """Perform a self-destruct action on the unit at the given coordinate."""
         # Check if the coordinate is valid
         if not self.is_valid_coord(coord):
@@ -663,16 +704,20 @@ class Game:
             return (False, "No unit or not your unit to self-destruct")
 
         # Inflict damage to all surrounding units
+        affected_units = []  # Keep track of affected units
         for adj_coord in coord.iter_all_surrounding():
             if self.is_valid_coord(adj_coord):
                 target_unit = self.get(adj_coord)
                 if target_unit:  # If there's a unit in the adjacent cell
                     self.mod_health(adj_coord, -2)  # Inflict 2 points of damage
+                    affected_units.append(adj_coord)  # Add to the list of affected units
 
         # Remove the unit that self-destructed
         self.set(coord, None)
 
-        return (True, f"Unit at {coord.row, coord.col} self-destructed!")
+        # Create a message for affected units
+        affected_units_str = ', '.join([str(c) for c in affected_units])
+        return (True, f"Unit at {coord.row, coord.col} self-destructed! Affected units: {affected_units_str}")
 
     def is_game_over(self) -> Tuple[bool, str]:
         if not self._attacker_has_ai:
