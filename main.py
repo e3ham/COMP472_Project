@@ -626,9 +626,16 @@ class Game:
         # Calculate the damage inflicted by the source unit on the destination unit
         repair = src_unit.repair_amount(dst_unit)
 
+        #Check if source unit can repair destination unit
+        if repair == 0:
+            return (False, "Invalid target unit, can't repair this unit")
+        
+        #Check if destination unit is already full health
+        if dst_unit.health == 9:
+            return (False, "Invalid target unit, target already full health")
+
         # Modify the health of the target unit and the source unit based on the damage
         self.mod_health(dst_coord, +repair)
-        self.mod_health(src_coord, +repair)
 
         return (True, f"Repaired {dst_coord.to_string()} with {src_coord.to_string()}, repaired: {repair}")
 
