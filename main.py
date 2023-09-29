@@ -606,6 +606,31 @@ class Game:
 
         return (True, f"Attacked {dst_coord.to_string()} with {src_coord.to_string()}, damage: {damage}")
 
+    def repair(self, src_coord: Coord, dst_coord: Coord) -> Tuple[bool, str]:
+        """Perform a repair from src_coord to dst_coord."""
+        src_unit = self.get(src_coord)
+        dst_unit = self.get(dst_coord)
+
+        # Check if the source and destination coordinates are valid
+        if not self.is_valid_coord(src_coord) or not self.is_valid_coord(dst_coord):
+            return (False, "Invalid coordinates")
+
+        # Check if there is a unit at the source coordinate and it belongs to the current player
+        if src_unit is None or src_unit.player != self.next_player:
+            return (False, "Invalid source unit")
+
+        # Check if there is a unit at the destination coordinate and it belongs to the current player
+        if dst_unit is None or dst_unit.player != self.next_player:
+            return (False, "Invalid target unit")
+
+        # Calculate the damage inflicted by the source unit on the destination unit
+        repair = src_unit.repair_amount(dst_unit)
+
+        # Modify the health of the target unit and the source unit based on the damage
+        self.mod_health(dst_coord, +repair)
+        self.mod_health(src_coord, +repair)
+
+        return (True, f"Repaired {dst_coord.to_string()} with {src_coord.to_string()}, repaired: {repair}")
 
 ##############################################################################################################
 
