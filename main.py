@@ -389,7 +389,7 @@ class Game:
         if coords.src == coords.dst:
             print(f"Attempting to self-destruct at {coords.src}")
             affected_units = self.self_destruct(coords.src)
-            if affected_units:
+            if affected_units and src_unit.player == self.next_player:
                 affected_units_str = ', '.join([str(coord) for coord in affected_units])
                 return (True, f"Self-destructed at {coords.src}. Affected units: {affected_units_str}")
             return (False, "Self-destruction failed")  # Explicitly specifying the failure reason
@@ -447,6 +447,19 @@ class Game:
     def __str__(self) -> str:
         """Default string representation of a game."""
         return self.to_string()
+
+    def is_game_over(self) -> Tuple[bool, str]:
+        if not self._attacker_has_ai:
+            return (True, "Defender wins!")
+        if not self._defender_has_ai:
+            return (True, "Attacker wins!")
+        if not self._attacker_has_ai and not self._defender_has_ai:
+            return (True, "Defender wins!")
+        if not self._defender_has_ai:
+            return (True, "Attacker wins!")
+        if self.turns_played >= 100:  # Assuming 100 as the limit
+            return (True, "Game over! Defender wins due to move limit!")
+        return (False, "")
 
     def is_valid_coord(self, coord: Coord) -> bool:
         """Check if a Coord is valid within out board dimensions."""
@@ -703,6 +716,15 @@ class Game:
         if unit is None or unit.player != self.next_player:
             return (False, "No unit or not your unit to self-destruct")
 
+
+        if unit.type == UnitType.AI:
+            if unit.player == Player.Attacker:
+                self._attacker_has_ai = False
+                return (True, f"Attacker's unit at {coord.row, coord.col} self-destructed! Defender wins!")
+            elif unit.player == Player.Defender:
+                self._defender_has_ai = False
+                return (True, f"Defender's unit at {coord.row, coord.col} self-destructed! Attacker wins!")
+
         # Inflict damage to all surrounding units
         affected_units = []  # Keep track of affected units
         for adj_coord in coord.iter_all_surrounding():
@@ -718,15 +740,6 @@ class Game:
         # Create a message for affected units
         affected_units_str = ', '.join([str(c) for c in affected_units])
         return (True, f"Unit at {coord.row, coord.col} self-destructed! Affected units: {affected_units_str}")
-
-    def is_game_over(self) -> Tuple[bool, str]:
-        if not self._attacker_has_ai:
-            return (True, "Defender wins!")
-        if not self._defender_has_ai:
-            return (True, "Attacker wins!")
-        if self.turns_played >= 100:  # Assuming 100 as the limit
-            return (True, "Game over! Defender wins due to move limit!")
-        return (False, "")
 
 
 ##############################################################################################################
