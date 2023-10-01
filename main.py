@@ -13,6 +13,9 @@ import requests
 MAX_HEURISTIC_SCORE = 2000000000
 MIN_HEURISTIC_SCORE = -2000000000
 
+#create the output file
+with open('gameTrace.txt', 'w') as f:
+    f.write("")
 
 class UnitType(Enum):
     """Every unit type."""
@@ -376,6 +379,8 @@ class Game:
             print(f"Move from {coords.src} to {coords.dst} is valid")
             self.set(coords.dst, self.get(coords.src))
             self.set(coords.src, None)
+            with open('gameTrace.txt', 'a') as f:
+                f.write(f"Moved from {coords.src} to {coords.dst}")
             return (True, f"Moved from {coords.src} to {coords.dst}")
 
         src_unit = self.get(coords.src)
@@ -391,6 +396,8 @@ class Game:
             affected_units = self.self_destruct(coords.src)
             if affected_units and src_unit.player == self.next_player:
                 affected_units_str = ', '.join([str(coord) for coord in affected_units])
+                with open('gameTrace.txt', 'a') as f:
+                    f.write(f"Self-destructed at {coords.src}. Affected units: {affected_units_str}")
                 return (True, f"Self-destructed at {coords.src}. Affected units: {affected_units_str}")
             return (False, "Self-destruction failed")  # Explicitly specifying the failure reason
 
@@ -399,6 +406,8 @@ class Game:
             print(f"Attempting to attack from {coords.src} to {coords.dst}")
             success, message = self.attack(coords.src, coords.dst)
             if success:
+                with open('gameTrace.txt', 'a') as f:
+                    f.write(f"Attacked from {coords.src} to {coords.dst}")
                 return (True, f"Attacked from {coords.src} to {coords.dst}")
             return (False, message)  # Explicitly returning the error from attack method
 
@@ -407,6 +416,8 @@ class Game:
             print(f"Attempting to repair {coords.dst} using {coords.src}")
             success, message = self.repair(coords.src, coords.dst)
             if success:
+                with open('gameTrace.txt', 'a') as f:
+                    f.write(f"Repaired {coords.dst} using {coords.src}")
                 return (True, f"Repaired {coords.dst} using {coords.src}")
             return (False, message)  # Explicitly returning the error from repair method
 
@@ -442,6 +453,10 @@ class Game:
                 else:
                     output += f"{str(unit):^3} "
             output += "\n"
+        with open('gameTrace.txt', 'a') as f:
+                    f.write("\n")
+                    f.write("\n")
+                    f.write(f"{output}")
         return output
 
     def __str__(self) -> str:
@@ -786,7 +801,10 @@ def main():
         print(game)
         winner = game.has_winner()
         if winner is not None:
+            with open('gameTrace.txt', 'a') as f:
+                f.write(f"{winner.name} wins in {game.turns_played}")
             print(f"{winner.name} wins!")
+            f.close()
             break
         if game.options.game_type == GameType.AttackerVsDefender:
             game.human_turn()
