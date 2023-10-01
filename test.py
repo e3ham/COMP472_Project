@@ -13,9 +13,6 @@ import requests
 MAX_HEURISTIC_SCORE = 2000000000
 MIN_HEURISTIC_SCORE = -2000000000
 
-#create the output file
-with open('gameTrace-b-t-50.txt', 'w') as f:
-    f.write("")
 
 class UnitType(Enum):
     """Every unit type."""
@@ -379,8 +376,6 @@ class Game:
             print(f"Move from {coords.src} to {coords.dst} is valid")
             self.set(coords.dst, self.get(coords.src))
             self.set(coords.src, None)
-            with open('gameTrace-b-t-50.txt', 'a') as f:
-                f.write(f"Moved from {coords.src} to {coords.dst}")
             return (True, f"Moved from {coords.src} to {coords.dst}")
 
         src_unit = self.get(coords.src)
@@ -394,10 +389,8 @@ class Game:
         if coords.src == coords.dst:
             print(f"Attempting to self-destruct at {coords.src}")
             affected_units = self.self_destruct(coords.src)
-            if affected_units and src_unit.player == self.next_player:
+            if affected_units:
                 affected_units_str = ', '.join([str(coord) for coord in affected_units])
-                with open('gameTrace-b-t-50.txt', 'a') as f:
-                    f.write(f"Self-destructed at {coords.src}. Affected units: {affected_units_str}")
                 return (True, f"Self-destructed at {coords.src}. Affected units: {affected_units_str}")
             return (False, "Self-destruction failed")  # Explicitly specifying the failure reason
 
@@ -406,8 +399,6 @@ class Game:
             print(f"Attempting to attack from {coords.src} to {coords.dst}")
             success, message = self.attack(coords.src, coords.dst)
             if success:
-                with open('gameTrace-b-t-50.txt', 'a') as f:
-                    f.write(f"Attacked from {coords.src} to {coords.dst}")
                 return (True, f"Attacked from {coords.src} to {coords.dst}")
             return (False, message)  # Explicitly returning the error from attack method
 
@@ -416,8 +407,6 @@ class Game:
             print(f"Attempting to repair {coords.dst} using {coords.src}")
             success, message = self.repair(coords.src, coords.dst)
             if success:
-                with open('gameTrace-b-t-50.txt', 'a') as f:
-                    f.write(f"Repaired {coords.dst} using {coords.src}")
                 return (True, f"Repaired {coords.dst} using {coords.src}")
             return (False, message)  # Explicitly returning the error from repair method
 
@@ -453,28 +442,11 @@ class Game:
                 else:
                     output += f"{str(unit):^3} "
             output += "\n"
-        with open('gameTrace-b-t-50.txt', 'a') as f:
-                    f.write("\n")
-                    f.write("\n")
-                    f.write(f"{output}")
         return output
 
     def __str__(self) -> str:
         """Default string representation of a game."""
         return self.to_string()
-
-    def is_game_over(self) -> Tuple[bool, str]:
-        if not self._attacker_has_ai:
-            return (True, "Game over! Defender wins!")
-        if not self._defender_has_ai:
-            return (True, "Game over! Attacker wins!")
-        if not self._attacker_has_ai and not self._defender_has_ai:
-            return (True, "Game over! Defender wins!")
-        if not self._defender_has_ai:
-            return (True, "Game over! Attacker wins!")
-        if self.turns_played >= 100:  # Assuming 100 as the limit
-            return (True, "Game over! Defender wins due to move limit!")
-        return (False, "")
 
     def is_valid_coord(self, coord: Coord) -> bool:
         """Check if a Coord is valid within out board dimensions."""
@@ -731,14 +703,6 @@ class Game:
         if unit is None or unit.player != self.next_player:
             return (False, "No unit or not your unit to self-destruct")
 
-        if unit.type == UnitType.AI:
-            if unit.player == Player.Attacker:
-                self._attacker_has_ai = False
-                return (True, f"Attacker's unit at {coord.row, coord.col} self-destructed! Game over! Defender wins!")
-            elif unit.player == Player.Defender:
-                self._defender_has_ai = False
-                return (True, f"Defender's unit at {coord.row, coord.col} self-destructed! Game over! Attacker wins!")
-
         # Inflict damage to all surrounding units
         affected_units = []  # Keep track of affected units
         for adj_coord in coord.iter_all_surrounding():
@@ -754,6 +718,15 @@ class Game:
         # Create a message for affected units
         affected_units_str = ', '.join([str(c) for c in affected_units])
         return (True, f"Unit at {coord.row, coord.col} self-destructed! Affected units: {affected_units_str}")
+
+    def is_game_over(self) -> Tuple[bool, str]:
+        if not self._attacker_has_ai:
+            return (True, "Defender wins!")
+        if not self._defender_has_ai:
+            return (True, "Attacker wins!")
+        if self.turns_played >= 100:  # Assuming 100 as the limit
+            return (True, "Game over! Defender wins due to move limit!")
+        return (False, "")
 
 
 ##############################################################################################################
@@ -793,10 +766,6 @@ def main():
 
     # create a new game
     game = Game(options=options)
-    with open('gameTrace-b-t-50.txt', 'a') as f:
-                f.write("GAME PARAMETERS \n")
-                f.write(f"Max number of turns: {game.options.max_turns} \n")
-                f.write(f"Play mode: manual \n")
 
     # the main game loop
     while True:
@@ -804,10 +773,7 @@ def main():
         print(game)
         winner = game.has_winner()
         if winner is not None:
-            with open('gameTrace-b-t-50.txt', 'a') as f:
-                f.write(f"Game over! {winner.name} wins in {game.turns_played} turns.")
-            print(f"Game over! {winner.name} wins!")
-            f.close()
+            print(f"{winner.name} wins!")
             break
         if game.options.game_type == GameType.AttackerVsDefender:
             game.human_turn()
