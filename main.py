@@ -794,6 +794,10 @@ def main():
 
     # create a new game
     game = Game(options=options)
+    with open('gameTrace.txt', 'a') as f:
+                f.write("GAME PARAMETERS \n")
+                f.write(f"Max number of turns: {game.options.max_turns} \n")
+                f.write(f"Play mode: manual \n")
 
     # the main game loop
     while True:
