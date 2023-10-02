@@ -13,9 +13,10 @@ import requests
 MAX_HEURISTIC_SCORE = 2000000000
 MIN_HEURISTIC_SCORE = -2000000000
 
-#create the output file
+# create the output file
 with open('gameTrace-b-t-50.txt', 'w') as f:
     f.write("")
+
 
 class UnitType(Enum):
     """Every unit type."""
@@ -454,9 +455,9 @@ class Game:
                     output += f"{str(unit):^3} "
             output += "\n"
         with open('gameTrace-b-t-50.txt', 'a') as f:
-                    f.write("\n")
-                    f.write("\n")
-                    f.write(f"{output}")
+            f.write("\n")
+            f.write("\n")
+            f.write(f"{output}")
         return output
 
     def __str__(self) -> str:
@@ -755,6 +756,73 @@ class Game:
         affected_units_str = ', '.join([str(c) for c in affected_units])
         return (True, f"Unit at {coord.row, coord.col} self-destructed! Affected units: {affected_units_str}")
 
+    # DEMO ONLY
+    def heuristic_e0(game, player):
+        # Initialize counts for each unit type
+        VPi = TPi = FPi = PPi = AIPi = 0
+
+        # Iterate through all units on the board
+        for coord in CoordPair.from_dim(game.options.dim).iter_rectangle():
+            unit = game.get(coord)
+            if unit is not None and unit.player == player:
+                if unit.type == UnitType.Virus:
+                    VPi += 1
+                elif unit.type == UnitType.Tech:
+                    TPi += 1
+                elif unit.type == UnitType.Firewall:
+                    FPi += 1
+                elif unit.type == UnitType.Program:
+                    PPi += 1
+                elif unit.type == UnitType.AI:
+                    AIPi += 1
+
+        # Calculate e0 using the formula
+        e0 = (3 * VPi + 3 * TPi + 3 * FPi + 3 * PPi + 9999 * AIPi)
+
+        return e0
+
+    # focus on the total health points of each player's units,
+    # favor the player with higher total health points among their units
+    def heuristic_e1(game, player):
+        # Initialize total health points for each player
+        total_health_player = 0
+        total_health_opponent = 0
+
+        # Iterate through all units on the board
+        for coord in CoordPair.from_dim(game.options.dim).iter_rectangle():
+            unit = game.get(coord)
+            if unit is not None:
+                if unit.player == player:
+                    total_health_player += unit.health
+                else:
+                    total_health_opponent += unit.health
+
+        # Calculate e1 using the difference in total health points
+        e1 = total_health_player - total_health_opponent
+
+        return e1
+
+    # focus on the number of units on the board for each player,
+    # encourages having more units on the board compared to the opponent
+    def heuristic_e2(game, player):
+        # Initialize unit counts for each player
+        unit_count_player = 0
+        unit_count_opponent = 0
+
+        # Iterate through all units on the board
+        for coord in CoordPair.from_dim(game.options.dim).iter_rectangle():
+            unit = game.get(coord)
+            if unit is not None:
+                if unit.player == player:
+                    unit_count_player += 1
+                else:
+                    unit_count_opponent += 1
+
+        # Calculate e2 using the difference in unit counts
+        e2 = unit_count_player - unit_count_opponent
+
+        return e2
+
 
 ##############################################################################################################
 
@@ -794,9 +862,9 @@ def main():
     # create a new game
     game = Game(options=options)
     with open('gameTrace-b-t-50.txt', 'a') as f:
-                f.write("GAME PARAMETERS \n")
-                f.write(f"Max number of turns: {game.options.max_turns} \n")
-                f.write(f"Play mode: manual \n")
+        f.write("GAME PARAMETERS \n")
+        f.write(f"Max number of turns: {game.options.max_turns} \n")
+        f.write(f"Play mode: manual \n")
 
     # the main game loop
     while True:
