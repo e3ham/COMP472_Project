@@ -13,10 +13,9 @@ import requests
 MAX_HEURISTIC_SCORE = 2000000000
 MIN_HEURISTIC_SCORE = -2000000000
 
-# create the output file
+#create the output file
 with open('gameTrace-b-t-50.txt', 'w') as f:
     f.write("")
-
 
 class UnitType(Enum):
     """Every unit type."""
@@ -455,9 +454,9 @@ class Game:
                     output += f"{str(unit):^3} "
             output += "\n"
         with open('gameTrace-b-t-50.txt', 'a') as f:
-            f.write("\n")
-            f.write("\n")
-            f.write(f"{output}")
+                    f.write("\n")
+                    f.write("\n")
+                    f.write(f"{output}")
         return output
 
     def __str__(self) -> str:
@@ -756,14 +755,15 @@ class Game:
         affected_units_str = ', '.join([str(c) for c in affected_units])
         return (True, f"Unit at {coord.row, coord.col} self-destructed! Affected units: {affected_units_str}")
 
+
     # DEMO ONLY
-    def heuristic_e0(game, player):
+    def heuristic_e0(self, player):
         # Initialize counts for each unit type
         VPi = TPi = FPi = PPi = AIPi = 0
 
         # Iterate through all units on the board
-        for coord in CoordPair.from_dim(game.options.dim).iter_rectangle():
-            unit = game.get(coord)
+        for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
+            unit = self.get(coord)
             if unit is not None and unit.player == player:
                 if unit.type == UnitType.Virus:
                     VPi += 1
@@ -783,14 +783,14 @@ class Game:
 
     # focus on the total health points of each player's units,
     # favor the player with higher total health points among their units
-    def heuristic_e1(game, player):
+    def heuristic_e1(self, player):
         # Initialize total health points for each player
         total_health_player = 0
         total_health_opponent = 0
 
         # Iterate through all units on the board
-        for coord in CoordPair.from_dim(game.options.dim).iter_rectangle():
-            unit = game.get(coord)
+        for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
+            unit = self.get(coord)
             if unit is not None:
                 if unit.player == player:
                     total_health_player += unit.health
@@ -804,14 +804,14 @@ class Game:
 
     # focus on the number of units on the board for each player,
     # encourages having more units on the board compared to the opponent
-    def heuristic_e2(game, player):
+    def heuristic_e2(self, player):
         # Initialize unit counts for each player
         unit_count_player = 0
         unit_count_opponent = 0
 
         # Iterate through all units on the board
-        for coord in CoordPair.from_dim(game.options.dim).iter_rectangle():
-            unit = game.get(coord)
+        for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
+            unit = self.get(coord)
             if unit is not None:
                 if unit.player == player:
                     unit_count_player += 1
@@ -822,6 +822,84 @@ class Game:
         e2 = unit_count_player - unit_count_opponent
 
         return e2
+
+    def get_valid_moves(self):
+        valid_moves = []
+
+        # Iterate through the board to find valid moves
+        for src_coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
+            src_unit = self.get(src_coord)
+
+            # Check if there is a unit at the source coordinate
+            if src_unit is not None and src_unit.player == self.next_player:
+                for dst_coord in src_coord.iter_adjacent():
+                    # Check if the destination coordinate is within bounds
+                    if self.is_valid_coord(dst_coord):
+                        dst_unit = self.get(dst_coord)
+
+                        # Check if the destination coordinate is empty
+                        if dst_unit is None:
+                            # Append a move representing a move action
+                            valid_moves.append((src_coord, dst_coord, "move"))
+
+                        # Check if it's a valid attack action
+                        elif dst_unit.player != self.next_player:
+                            # Append a move representing an attack action
+                            valid_moves.append((src_coord, dst_coord, "attack"))
+
+            return valid_moves
+
+    def get_state(self):
+        # Create a deep copy of the board state
+        return [list(row) for row in self.board]
+
+    def undo_move(self, coords: CoordPair, prev_src_unit: Unit, prev_dst_unit: Unit):
+        """Undo a move expressed as a CoordPair."""
+        self.set(coords.src, prev_src_unit)
+        self.set(coords.dst, prev_dst_unit)
+
+    def minimax(self, depth, maximizing_player):
+        if depth == 0 or self.is_finished():
+            return self.heuristic_e0(self)
+
+        if maximizing_player:
+            max_eval = float('-inf')
+            for move_tuple in self.get_valid_moves():
+                src_coord, dst_coord, action_str = move_tuple  # Extract the source and destination coordinates
+                move_to_perform = CoordPair(src_coord, dst_coord)  # Create a CoordPair from src and dst
+                prev_src_unit = self.get(move_to_perform.src)  # Get the unit at the source
+                prev_dst_unit = self.get(move_to_perform.dst)  # Get the unit at the destination
+
+                # Make the move
+                self.perform_move(move_to_perform)
+
+                evaluate = self.minimax(depth - 1, False)  # Recurse with the new state
+
+                # Undo the move by restoring the previous units
+                self.set(move_to_perform.src, prev_src_unit)
+                self.set(move_to_perform.dst, prev_dst_unit)
+
+                max_eval = max(max_eval, evaluate)
+            return max_eval
+        else:
+            min_eval = float('inf')
+            for move_tuple in self.get_valid_moves():
+                src_coord, dst_coord, action_str = move_tuple  # Extract the source and destination coordinates
+                move_to_perform = CoordPair(src_coord, dst_coord)  # Create a CoordPair from src and dst
+                prev_src_unit = self.get(move_to_perform.src)  # Get the unit at the source
+                prev_dst_unit = self.get(move_to_perform.dst)  # Get the unit at the destination
+
+                # Make the move
+                self.perform_move(move_to_perform)
+
+                evaluate = self.minimax(depth - 1, True)  # Recurse with the new state
+
+                # Undo the move by restoring the previous units
+                self.set(move_to_perform.src, prev_src_unit)
+                self.set(move_to_perform.dst, prev_dst_unit)
+
+                min_eval = min(min_eval, evaluate)
+            return min_eval
 
 
 ##############################################################################################################
@@ -862,9 +940,9 @@ def main():
     # create a new game
     game = Game(options=options)
     with open('gameTrace-b-t-50.txt', 'a') as f:
-        f.write("GAME PARAMETERS \n")
-        f.write(f"Max number of turns: {game.options.max_turns} \n")
-        f.write(f"Play mode: manual \n")
+                f.write("GAME PARAMETERS \n")
+                f.write(f"Max number of turns: {game.options.max_turns} \n")
+                f.write(f"Play mode: manual \n")
 
     # the main game loop
     while True:
