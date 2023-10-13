@@ -756,6 +756,152 @@ class Game:
         return (True, f"Unit at {coord.row, coord.col} self-destructed! Affected units: {affected_units_str}")
 
 
+    # DEMO ONLY
+    def heuristic_e0(self, player):
+        # Initialize counts for each unit type
+        VPi = TPi = FPi = PPi = AIPi = 0
+
+        # Iterate through all units on the board
+        for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
+            unit = self.get(coord)
+            if unit is not None and unit.player == player:
+                if unit.type == UnitType.Virus:
+                    VPi += 1
+                elif unit.type == UnitType.Tech:
+                    TPi += 1
+                elif unit.type == UnitType.Firewall:
+                    FPi += 1
+                elif unit.type == UnitType.Program:
+                    PPi += 1
+                elif unit.type == UnitType.AI:
+                    AIPi += 1
+
+        # Calculate e0 using the formula
+        e0 = (3 * VPi + 3 * TPi + 3 * FPi + 3 * PPi + 9999 * AIPi)
+
+        return e0
+
+    # focus on the total health points of each player's units,
+    # favor the player with higher total health points among their units
+    def heuristic_e1(self, player):
+        # Initialize total health points for each player
+        total_health_player = 0
+        total_health_opponent = 0
+
+        # Iterate through all units on the board
+        for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
+            unit = self.get(coord)
+            if unit is not None:
+                if unit.player == player:
+                    total_health_player += unit.health
+                else:
+                    total_health_opponent += unit.health
+
+        # Calculate e1 using the difference in total health points
+        e1 = total_health_player - total_health_opponent
+
+        return e1
+
+    # focus on the number of units on the board for each player,
+    # encourages having more units on the board compared to the opponent
+    def heuristic_e2(self, player):
+        # Initialize unit counts for each player
+        unit_count_player = 0
+        unit_count_opponent = 0
+
+        # Iterate through all units on the board
+        for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
+            unit = self.get(coord)
+            if unit is not None:
+                if unit.player == player:
+                    unit_count_player += 1
+                else:
+                    unit_count_opponent += 1
+
+        # Calculate e2 using the difference in unit counts
+        e2 = unit_count_player - unit_count_opponent
+
+        return e2
+
+    def get_valid_moves(self):
+        valid_moves = []
+
+        # Iterate through the board to find valid moves
+        for src_coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
+            src_unit = self.get(src_coord)
+
+            # Check if there is a unit at the source coordinate
+            if src_unit is not None and src_unit.player == self.next_player:
+                for dst_coord in src_coord.iter_adjacent():
+                    # Check if the destination coordinate is within bounds
+                    if self.is_valid_coord(dst_coord):
+                        dst_unit = self.get(dst_coord)
+
+                        # Check if the destination coordinate is empty
+                        if dst_unit is None:
+                            # Append a move representing a move action
+                            valid_moves.append((src_coord, dst_coord, "move"))
+
+                        # Check if it's a valid attack action
+                        elif dst_unit.player != self.next_player:
+                            # Append a move representing an attack action
+                            valid_moves.append((src_coord, dst_coord, "attack"))
+
+            return valid_moves
+
+    def get_state(self):
+        # Create a deep copy of the board state
+        return [list(row) for row in self.board]
+
+    def undo_move(self, coords: CoordPair, prev_src_unit: Unit, prev_dst_unit: Unit):
+        """Undo a move expressed as a CoordPair."""
+        self.set(coords.src, prev_src_unit)
+        self.set(coords.dst, prev_dst_unit)
+
+    def minimax(self, depth, maximizing_player):
+        if depth == 0 or self.is_finished():
+            return self.heuristic_e0(self)
+
+        if maximizing_player:
+            max_eval = float('-inf')
+            for move_tuple in self.get_valid_moves():
+                src_coord, dst_coord, action_str = move_tuple  # Extract the source and destination coordinates
+                move_to_perform = CoordPair(src_coord, dst_coord)  # Create a CoordPair from src and dst
+                prev_src_unit = self.get(move_to_perform.src)  # Get the unit at the source
+                prev_dst_unit = self.get(move_to_perform.dst)  # Get the unit at the destination
+
+                # Make the move
+                self.perform_move(move_to_perform)
+
+                evaluate = self.minimax(depth - 1, False)  # Recurse with the new state
+
+                # Undo the move by restoring the previous units
+                self.set(move_to_perform.src, prev_src_unit)
+                self.set(move_to_perform.dst, prev_dst_unit)
+
+                max_eval = max(max_eval, evaluate)
+            return max_eval
+        else:
+            min_eval = float('inf')
+            for move_tuple in self.get_valid_moves():
+                src_coord, dst_coord, action_str = move_tuple  # Extract the source and destination coordinates
+                move_to_perform = CoordPair(src_coord, dst_coord)  # Create a CoordPair from src and dst
+                prev_src_unit = self.get(move_to_perform.src)  # Get the unit at the source
+                prev_dst_unit = self.get(move_to_perform.dst)  # Get the unit at the destination
+
+                # Make the move
+                self.perform_move(move_to_perform)
+
+                evaluate = self.minimax(depth - 1, True)  # Recurse with the new state
+
+                # Undo the move by restoring the previous units
+                self.set(move_to_perform.src, prev_src_unit)
+                self.set(move_to_perform.dst, prev_dst_unit)
+
+                min_eval = min(min_eval, evaluate)
+            return min_eval
+
+
 ##############################################################################################################
 
 def main():
