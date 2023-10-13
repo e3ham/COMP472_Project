@@ -362,12 +362,15 @@ class Game:
         # Check movement restrictions for AI, Firewall, and Program
         if src_unit.type in [UnitType.AI, UnitType.Firewall, UnitType.Program]:
             if src_unit.player == Player.Attacker:
-                return coords.src.row >= coords.dst.row and coords.src.col >= coords.dst.col
+                return (coords.src.row == coords.dst.row and coords.src.col - coords.dst.col == 1) or \
+                    (coords.src.col == coords.dst.col and coords.src.row - coords.dst.row == 1)
             else:  # Defender
-                return coords.src.row <= coords.dst.row and coords.src.col <= coords.dst.col
+                return (coords.src.row == coords.dst.row and coords.dst.col - coords.src.col == 1) or \
+                    (coords.src.col == coords.dst.col and coords.dst.row - coords.src.row == 1)
 
         # Tech and Virus can move to adjacent cells
-        return coords.src.row != coords.dst.row or coords.src.col != coords.dst.col
+        return (coords.src.row == coords.dst.row and abs(coords.src.col - coords.dst.col) == 1) or \
+               (coords.src.col == coords.dst.col and abs(coords.src.row - coords.dst.row) == 1)
 
     def perform_move(self, coords: CoordPair) -> Tuple[bool, str]:
         """Validate and perform a move expressed as a CoordPair."""
