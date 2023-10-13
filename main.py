@@ -881,6 +881,7 @@ class Game:
                 # Undo the move by restoring the previous units
                 self.set(move_to_perform.src, prev_src_unit)
                 self.set(move_to_perform.dst, prev_dst_unit)
+
                 max_eval = max(max_eval, evaluate)
             return max_eval
         else:
