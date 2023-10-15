@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass, field
 from time import sleep
-from typing import Tuple, TypeVar, Type, Iterable, ClassVar
+from typing import Tuple, TypeVar, Type, Iterable, ClassVar, Any
 import random
 import requests
 
@@ -13,9 +13,10 @@ import requests
 MAX_HEURISTIC_SCORE = 2000000000
 MIN_HEURISTIC_SCORE = -2000000000
 
-#create the output file
+# create the output file
 with open('gameTrace-b-t-50.txt', 'w') as f:
     f.write("")
+
 
 class UnitType(Enum):
     """Every unit type."""
@@ -362,15 +363,12 @@ class Game:
         # Check movement restrictions for AI, Firewall, and Program
         if src_unit.type in [UnitType.AI, UnitType.Firewall, UnitType.Program]:
             if src_unit.player == Player.Attacker:
-                return (coords.src.row == coords.dst.row and coords.src.col - coords.dst.col == 1) or \
-                    (coords.src.col == coords.dst.col and coords.src.row - coords.dst.row == 1)
+                return coords.src.row >= coords.dst.row and coords.src.col >= coords.dst.col
             else:  # Defender
-                return (coords.src.row == coords.dst.row and coords.dst.col - coords.src.col == 1) or \
-                    (coords.src.col == coords.dst.col and coords.dst.row - coords.src.row == 1)
+                return coords.src.row <= coords.dst.row and coords.src.col <= coords.dst.col
 
         # Tech and Virus can move to adjacent cells
-        return (coords.src.row == coords.dst.row and abs(coords.src.col - coords.dst.col) == 1) or \
-               (coords.src.col == coords.dst.col and abs(coords.src.row - coords.dst.row) == 1)
+        return coords.src.row != coords.dst.row or coords.src.col != coords.dst.col
 
     def perform_move(self, coords: CoordPair) -> Tuple[bool, str]:
         """Validate and perform a move expressed as a CoordPair."""
@@ -457,9 +455,9 @@ class Game:
                     output += f"{str(unit):^3} "
             output += "\n"
         with open('gameTrace-b-t-50.txt', 'a') as f:
-                    f.write("\n")
-                    f.write("\n")
-                    f.write(f"{output}")
+            f.write("\n")
+            f.write("\n")
+            f.write(f"{output}")
         return output
 
     def __str__(self) -> str:
@@ -558,7 +556,7 @@ class Game:
         for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
             unit = self.get(coord)
             if unit is not None and unit.player == player:
-                yield (coord, unit)
+                yield coord, unit
 
     def is_finished(self) -> bool:
         """Check if the game is over."""
@@ -575,6 +573,7 @@ class Game:
                 return Player.Attacker
         elif self._defender_has_ai:
             return Player.Defender
+        return Player.Defender
 
     def move_candidates(self) -> Iterable[CoordPair]:
         """Generate valid move candidates for the next player."""
@@ -588,19 +587,9 @@ class Game:
             move.dst = src
             yield move.clone()
 
-    def random_move(self) -> Tuple[int, CoordPair | None, float]:
-        """Returns a random move."""
-        move_candidates = list(self.move_candidates())
-        random.shuffle(move_candidates)
-        if len(move_candidates) > 0:
-            return (0, move_candidates[0], 1)
-        else:
-            return (0, None, 0)
-
     def suggest_move(self) -> CoordPair | None:
-        """Suggest the next move using minimax alpha beta. TODO: REPLACE RANDOM_MOVE WITH PROPER GAME LOGIC!!!"""
         start_time = datetime.now()
-        (score, move, avg_depth) = self.random_move()
+        score, move, avg_depth = self.minimax_alpha_beta(self.options.max_depth, True, float('-inf'), float('inf'))
         elapsed_seconds = (datetime.now() - start_time).total_seconds()
         self.stats.total_seconds += elapsed_seconds
         print(f"Heuristic score: {score}")
@@ -614,6 +603,54 @@ class Game:
             print(f"Eval perf.: {total_evals / self.stats.total_seconds / 1000:0.1f}k/s")
         print(f"Elapsed time: {elapsed_seconds:0.1f}s")
         return move
+
+    def minimax_alpha_beta(self, depth, maximizing_player, alpha, beta) -> tuple[float | Any, tuple[Coord, Coord, str] |
+        None, float]:
+        if depth == 0 or self.is_finished():
+            # Calculate the heuristic score for this state
+            score = self.heuristic_e0(self.next_player)
+            return score, None, depth
+
+        if maximizing_player:
+            max_eval = float('-inf')
+            best_move = None
+            avg_depth = 0
+            for move in self.get_valid_moves():
+                src_coord, dst_coord, action_str = move  # Extract the source and destination coordinates
+                move_to_perform = CoordPair(src_coord, dst_coord)  # Convert to CoordPair
+                prev_state = self.get_state()
+                self.perform_move(move_to_perform)  # Make the move
+                evaluate, _, avg_depth = self.minimax_alpha_beta(depth - 1, False, alpha, beta)  # Recurse
+                self.undo_move(move_to_perform)  # Restore the previous state
+                max_eval = max(max_eval, evaluate)
+                if evaluate > alpha:
+                    alpha = evaluate
+                    best_move = move
+
+                if beta <= alpha:
+                    break  # Pruning
+
+            return max_eval, best_move, avg_depth
+        else:
+            min_eval = float('inf')
+            best_move = None
+            avg_depth = 0
+            for move in self.get_valid_moves():
+                src_coord, dst_coord, action_str = move  # Extract the source and destination coordinates
+                move_to_perform = CoordPair(src_coord, dst_coord)  # Convert to CoordPair
+                prev_state = self.get_state()
+                self.perform_move(move_to_perform)  # Make the move
+                evaluate, _, avg_depth = self.minimax_alpha_beta(depth - 1, True, alpha, beta)  # Recurse
+                self.undo_move(move_to_perform)  # Restore the previous state
+                min_eval = min(min_eval, evaluate)
+                if evaluate < beta:
+                    beta = evaluate
+                    best_move = move
+
+                if beta <= alpha:
+                    break  # Pruning
+
+            return min_eval, best_move, avg_depth
 
     def post_move_to_broker(self, move: CoordPair):
         """Send a move to the game broker."""
@@ -672,11 +709,11 @@ class Game:
         if not self.is_valid_coord(src_coord) or not self.is_valid_coord(dst_coord):
             return (False, "Invalid coordinates")
 
-        # Check if there is a unit at the source coordinate and it belongs to the current player
+        # Check if there is a unit at the source coordinate, and it belongs to the current player
         if src_unit is None or src_unit.player != self.next_player:
             return (False, "Invalid source unit")
 
-        # Check if there is a unit at the destination coordinate and it belongs to the opposing player
+        # Check if there is a unit at the destination coordinate, and it belongs to the opposing player
         if dst_unit is None or dst_unit.player == self.next_player:
             return (False, "Invalid target unit")
 
@@ -757,7 +794,6 @@ class Game:
         # Create a message for affected units
         affected_units_str = ', '.join([str(c) for c in affected_units])
         return (True, f"Unit at {coord.row, coord.col} self-destructed! Affected units: {affected_units_str}")
-
 
     # DEMO ONLY
     def heuristic_e0(self, player):
@@ -856,10 +892,10 @@ class Game:
         # Create a deep copy of the board state
         return [list(row) for row in self.board]
 
-    def undo_move(self, coords: CoordPair, prev_src_unit: Unit, prev_dst_unit: Unit):
-        """Undo a move expressed as a CoordPair."""
-        self.set(coords.src, prev_src_unit)
-        self.set(coords.dst, prev_dst_unit)
+    def undo_move(self, move: CoordPair):
+        # Implement the reverse of a move to restore the previous state
+        self.set(move.src, self.get(move.dst))
+        self.set(move.dst, None)
 
     def minimax(self, depth, maximizing_player):
         if depth == 0 or self.is_finished():
@@ -943,9 +979,9 @@ def main():
     # create a new game
     game = Game(options=options)
     with open('gameTrace-b-t-50.txt', 'a') as f:
-                f.write("GAME PARAMETERS \n")
-                f.write(f"Max number of turns: {game.options.max_turns} \n")
-                f.write(f"Play mode: manual \n")
+        f.write("GAME PARAMETERS \n")
+        f.write(f"Max number of turns: {game.options.max_turns} \n")
+        f.write(f"Play mode: manual \n")
 
     # the main game loop
     while True:
