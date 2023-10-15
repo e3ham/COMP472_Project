@@ -615,13 +615,11 @@ class Game:
             max_eval = float('-inf')
             best_move = None
             avg_depth = 0
-            for move in self.get_valid_moves():
-                src_coord, dst_coord, action_str = move  # Extract the source and destination coordinates
-                move_to_perform = CoordPair(src_coord, dst_coord)  # Convert to CoordPair
+            for move in self.move_candidates():
                 prev_state = self.get_state()
-                self.perform_move(move_to_perform)  # Make the move
+                #self.perform_move(move)  # Make the move
                 evaluate, _, avg_depth = self.minimax_alpha_beta(depth - 1, False, alpha, beta)  # Recurse
-                self.undo_move(move_to_perform)  # Restore the previous state
+                #self.undo_move(move)  # Restore the previous state
                 max_eval = max(max_eval, evaluate)
                 if evaluate > alpha:
                     alpha = evaluate
@@ -635,13 +633,11 @@ class Game:
             min_eval = float('inf')
             best_move = None
             avg_depth = 0
-            for move in self.get_valid_moves():
-                src_coord, dst_coord, action_str = move  # Extract the source and destination coordinates
-                move_to_perform = CoordPair(src_coord, dst_coord)  # Convert to CoordPair
+            for move in self.move_candidates():
                 prev_state = self.get_state()
-                self.perform_move(move_to_perform)  # Make the move
+                #self.perform_move(move)  # Make the move
                 evaluate, _, avg_depth = self.minimax_alpha_beta(depth - 1, True, alpha, beta)  # Recurse
-                self.undo_move(move_to_perform)  # Restore the previous state
+                #self.undo_move(move)  # Restore the previous state
                 min_eval = min(min_eval, evaluate)
                 if evaluate < beta:
                     beta = evaluate
@@ -950,7 +946,7 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--max_depth', type=int, help='maximum search depth')
     parser.add_argument('--max_time', type=float, help='maximum search time')
-    parser.add_argument('--game_type', type=str, default="manual", help='game type: auto|attacker|defender|manual')
+    parser.add_argument('--game_type', type=str, default="auto", help='game type: auto|attacker|defender|manual')
     parser.add_argument('--broker', type=str, help='play via a game broker')
     parser.add_argument('--attack', type=str, help='perform an attack in the format "A1 B2"')
     args = parser.parse_args()
