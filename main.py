@@ -604,7 +604,7 @@ class Game:
         print(f"Elapsed time: {elapsed_seconds:0.1f}s")
         return move
 
-    def minimax_alpha_beta(self, depth, maximizing_player, alpha, beta) -> tuple[float | Any, tuple[Coord, Coord, str] |
+    def minimax_alpha_beta(self, depth, maximizing_player, alpha, beta) -> tuple[float | Any, CoordPair |
         None, float]:
         if depth == 0 or self.is_finished():
             # Calculate the heuristic score for this state
