@@ -247,7 +247,7 @@ class Options:
     max_depth: int | None = 4
     min_depth: int | None = 2
     max_time: float | None = 5.0
-    game_type: GameType = GameType.AttackerVsDefender
+    game_type: GameType = GameType.CompVsComp
     alpha_beta: bool = True
     max_turns: int | None = 100
     randomize_moves: bool = True
@@ -578,14 +578,15 @@ class Game:
     def move_candidates(self) -> Iterable[CoordPair]:
         """Generate valid move candidates for the next player."""
         move = CoordPair()
+
         for (src, _) in self.player_units(self.next_player):
             move.src = src
+
+            # Iterate through all adjacent cells
             for dst in src.iter_adjacent():
                 move.dst = dst
                 if self.is_valid_move(move):
                     yield move.clone()
-            move.dst = src
-            yield move.clone()
 
     def suggest_move(self) -> CoordPair | None:
         start_time = datetime.now()
@@ -608,7 +609,7 @@ class Game:
         None, float]:
         if depth == 0 or self.is_finished():
             # Calculate the heuristic score for this state
-            score = self.heuristic_e0(self.next_player)
+            score = self.heuristic_e2(self.next_player)
             return score, None, depth
 
         if maximizing_player:
