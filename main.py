@@ -247,7 +247,7 @@ class Options:
     max_depth: int | None = 4
     min_depth: int | None = 2
     max_time: float | None = 5.0
-    game_type: GameType = GameType.CompVsComp
+    game_type: GameType = GameType.AttackerVsComp
     alpha_beta: bool = True
     max_turns: int | None = 100
     randomize_moves: bool = True
@@ -865,7 +865,6 @@ class Game:
         # Iterate through the board to find valid moves
         for src_coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
             src_unit = self.get(src_coord)
-
             # Check if there is a unit at the source coordinate
             if src_unit is not None and src_unit.player == self.next_player:
                 for dst_coord in src_coord.iter_adjacent():
@@ -883,7 +882,7 @@ class Game:
                             # Append a move representing an attack action
                             valid_moves.append((src_coord, dst_coord, "attack"))
 
-            return valid_moves
+        return valid_moves  # Make sure this is dedented correctly
 
     def get_state(self):
         # Create a deep copy of the board state
@@ -894,14 +893,18 @@ class Game:
         self.set(move.src, self.get(move.dst))
         self.set(move.dst, None)
 
-    def minimax(self, depth, maximizing_player):
+    def minimax(self, depth, maximizing_player, alpha=float('-inf'), beta=float('inf')):
+        best_move = None  # Store the best move found
+
         if depth == 0 or self.is_finished():
-            return self.heuristic_e0(self)
+            return (self.heuristic_e0(self.next_player), None)
+
+        valid_moves = self.get_valid_moves()
 
         if maximizing_player:
             max_eval = float('-inf')
-            for move_tuple in self.get_valid_moves():
-                src_coord, dst_coord, action_str = move_tuple  # Extract the source and destination coordinates
+            for move_tuple in valid_moves:
+                src_coord, dst_coord, action_str = move_tuple  # Extract source, destination coordinates, and action
                 move_to_perform = CoordPair(src_coord, dst_coord)  # Create a CoordPair from src and dst
                 prev_src_unit = self.get(move_to_perform.src)  # Get the unit at the source
                 prev_dst_unit = self.get(move_to_perform.dst)  # Get the unit at the destination
@@ -909,18 +912,23 @@ class Game:
                 # Make the move
                 self.perform_move(move_to_perform)
 
-                evaluate = self.minimax(depth - 1, False)  # Recurse with the new state
+                evaluate, _ = self.minimax(depth - 1, False, alpha, beta)  # Recurse with the new state
 
                 # Undo the move by restoring the previous units
                 self.set(move_to_perform.src, prev_src_unit)
                 self.set(move_to_perform.dst, prev_dst_unit)
 
-                max_eval = max(max_eval, evaluate)
-            return max_eval
+                if evaluate > max_eval:
+                    max_eval = evaluate
+                    best_move = move_to_perform
+                alpha = max(alpha, evaluate)
+                if beta <= alpha:
+                    break
+            return max_eval, best_move
         else:
             min_eval = float('inf')
-            for move_tuple in self.get_valid_moves():
-                src_coord, dst_coord, action_str = move_tuple  # Extract the source and destination coordinates
+            for move_tuple in valid_moves:
+                src_coord, dst_coord, action_str = move_tuple  # Extract source, destination coordinates, and action
                 move_to_perform = CoordPair(src_coord, dst_coord)  # Create a CoordPair from src and dst
                 prev_src_unit = self.get(move_to_perform.src)  # Get the unit at the source
                 prev_dst_unit = self.get(move_to_perform.dst)  # Get the unit at the destination
@@ -928,14 +936,19 @@ class Game:
                 # Make the move
                 self.perform_move(move_to_perform)
 
-                evaluate = self.minimax(depth - 1, True)  # Recurse with the new state
+                evaluate, _ = self.minimax(depth - 1, True, alpha, beta)  # Recurse with the new state
 
                 # Undo the move by restoring the previous units
                 self.set(move_to_perform.src, prev_src_unit)
                 self.set(move_to_perform.dst, prev_dst_unit)
 
-                min_eval = min(min_eval, evaluate)
-            return min_eval
+                if evaluate < min_eval:
+                    min_eval = evaluate
+                    best_move = move_to_perform
+                beta = min(beta, evaluate)
+                if beta <= alpha:
+                    break
+            return min_eval, best_move
 
 
 ##############################################################################################################
@@ -947,17 +960,29 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--max_depth', type=int, help='maximum search depth')
     parser.add_argument('--max_time', type=float, help='maximum search time')
-    parser.add_argument('--game_type', type=str, default="auto", help='game type: auto|attacker|defender|manual')
     parser.add_argument('--broker', type=str, help='play via a game broker')
     parser.add_argument('--attack', type=str, help='perform an attack in the format "A1 B2"')
     args = parser.parse_args()
 
+    # Prompt user for game type directly
+    print("Select game type:")
+    print("auto (CompVsComp)")
+    print("attacker (AttackerVsComp)")
+    print("defender (CompVsDefender)")
+    print("manual (AttackerVsDefender)")
+    game_type_input = input("Enter your choice: ")
+
+    valid_game_types = ["auto", "attacker", "defender", "manual"]
+    if game_type_input not in valid_game_types:
+        print(f"Invalid game type: {game_type_input}. Please choose from {', '.join(valid_game_types)}")
+        exit(1)
+
     # parse the game type
-    if args.game_type == "attacker":
+    if game_type_input == "attacker":
         game_type = GameType.AttackerVsComp
-    elif args.game_type == "defender":
+    elif game_type_input == "defender":
         game_type = GameType.CompVsDefender
-    elif args.game_type == "manual":
+    elif game_type_input == "manual":
         game_type = GameType.AttackerVsDefender
     else:
         game_type = GameType.CompVsComp
@@ -975,38 +1000,50 @@ def main():
 
     # create a new game
     game = Game(options=options)
+
     with open('gameTrace-b-t-50.txt', 'a') as f:
         f.write("GAME PARAMETERS \n")
         f.write(f"Max number of turns: {game.options.max_turns} \n")
-        f.write(f"Play mode: manual \n")
+        f.write(f"Play mode: {game_type_input} \n")
 
-    # the main game loop
-    while True:
-        print()
-        print(game)
-        winner = game.has_winner()
-        if winner is not None:
-            with open('gameTrace-b-t-50.txt', 'a') as f:
+        # the main game loop
+        while True:
+            print(game)
+            winner = game.has_winner()
+            if winner is not None:
                 f.write(f"Game over! {winner.name} wins in {game.turns_played} turns.")
-            print(f"Game over! {winner.name} wins!")
-            f.close()
-            break
-        if game.options.game_type == GameType.AttackerVsDefender:
-            game.human_turn()
-        elif game.options.game_type == GameType.AttackerVsComp and game.next_player == Player.Attacker:
-            game.human_turn()
-        elif game.options.game_type == GameType.CompVsDefender and game.next_player == Player.Defender:
-            game.human_turn()
-        else:
-            player = game.next_player
-            move = game.computer_turn()
-            if move is not None:
-                game.post_move_to_broker(move)
-            else:
-                print("Computer doesn't know what to do!!!")
-                exit(1)
+                print(f"Game over! {winner.name} wins!")
+                break
 
-
+            if game.options.game_type == GameType.AttackerVsDefender:
+                game.human_turn()
+            elif game.options.game_type == GameType.AttackerVsComp:
+                if game.next_player == Player.Attacker:
+                    game.human_turn()
+                else:
+                    move = game.computer_turn()
+                    if move is not None:
+                        game.post_move_to_broker(move)
+                    else:
+                        print("Computer doesn't know what to do!!!")
+                        exit(1)
+            elif game.options.game_type == GameType.CompVsDefender:
+                if game.next_player == Player.Defender:
+                    game.human_turn()
+                else:
+                    move = game.computer_turn()
+                    if move is not None:
+                        game.post_move_to_broker(move)
+                    else:
+                        print("Computer doesn't know what to do!!!")
+                        exit(1)
+            elif game.options.game_type == GameType.CompVsComp:
+                move = game.computer_turn()
+                if move is not None:
+                    game.post_move_to_broker(move)
+                else:
+                    print("Computer doesn't know what to do!!!")
+                    exit(1)
 ##############################################################################################################
 
 if __name__ == '__main__':
