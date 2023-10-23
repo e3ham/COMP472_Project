@@ -9,12 +9,13 @@ B: dT9 dP9  .   .   .
 C: dF9  .   .   .  aP9 
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:71 3:36 2:6 1:6 0:1 
-Eval perf.: 2.5k/s 
-Elapsed time: 0.0s 
+Eval perf.: 1.9k/s 
+Elapsed time: 0.1s 
 Cumulative evaluations: 120 
 Cumulative % evals per depth: 4:59.2% 3:30.0% 2:5.0% 1:5.0% 0:0.8% 
+Average branching factor: 5.0 
 Moved from C4 to B4
 
 Next player: Defender
@@ -26,12 +27,13 @@ B: dT9 dP9  .   .  aP9
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:142 3:72 2:12 1:12 0:2 
-Eval perf.: 2.8k/s 
-Elapsed time: 0.0s 
+Eval perf.: 1.9k/s 
+Elapsed time: 0.1s 
 Cumulative evaluations: 240 
 Cumulative % evals per depth: 4:59.2% 3:30.0% 2:5.0% 1:5.0% 0:0.8% 
+Average branching factor: 5.0 
 Moved from A2 to B2
 
 Next player: Attacker
@@ -43,12 +45,13 @@ B: dT9 dP9 dF9  .  aP9
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:239 3:121 2:19 1:19 0:3 
-Eval perf.: 3.0k/s 
-Elapsed time: 0.0s 
+Eval perf.: 2.0k/s 
+Elapsed time: 0.1s 
 Cumulative evaluations: 401 
 Cumulative % evals per depth: 4:59.6% 3:30.2% 2:4.7% 1:4.7% 0:0.7% 
+Average branching factor: 5.2 
 Moved from B4 to A4
 
 Next player: Defender
@@ -60,12 +63,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:310 3:157 2:25 1:25 0:4 
-Eval perf.: 3.1k/s 
+Eval perf.: 2.1k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 521 
 Cumulative % evals per depth: 4:59.5% 3:30.1% 2:4.8% 1:4.8% 0:0.8% 
+Average branching factor: 5.2 
 Moved from A1 to A2
 
 Next player: Attacker
@@ -77,12 +81,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:381 3:193 2:31 1:31 0:5 
-Eval perf.: 3.2k/s 
+Eval perf.: 2.3k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 641 
 Cumulative % evals per depth: 4:59.4% 3:30.1% 2:4.8% 1:4.8% 0:0.8% 
+Average branching factor: 5.1 
 Moved from A4 to A3
 
 Next player: Defender
@@ -94,12 +99,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:508 3:257 2:39 1:39 0:6 
-Eval perf.: 3.4k/s 
+Eval perf.: 2.6k/s 
 Elapsed time: 0.1s 
 Cumulative evaluations: 849 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.4 
 Moved from A0 to A1
 
 Next player: Attacker
@@ -111,12 +117,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:579 3:293 2:45 1:45 0:7 
-Eval perf.: 3.4k/s 
+Eval perf.: 2.7k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 969 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A3 to A2
 
 Next player: Defender
@@ -128,12 +135,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:676 3:342 2:52 1:52 0:8 
-Eval perf.: 3.3k/s 
+Eval perf.: 2.7k/s 
 Elapsed time: 0.1s 
 Cumulative evaluations: 1130 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.4 
 Attacked from A2 to A3
 
 Next player: Attacker
@@ -145,12 +153,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:747 3:378 2:58 1:58 0:9 
-Eval perf.: 3.4k/s 
+Eval perf.: 2.7k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 1250 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A3 to A2
 
 Next player: Defender
@@ -162,12 +171,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:844 3:427 2:65 1:65 0:10 
-Eval perf.: 3.4k/s 
-Elapsed time: 0.0s 
+Eval perf.: 2.8k/s 
+Elapsed time: 0.1s 
 Cumulative evaluations: 1411 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A2 to A3
 
 Next player: Attacker
@@ -179,12 +189,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10014 
 Evals per depth: 4:915 3:463 2:71 1:71 0:11 
-Eval perf.: 3.4k/s 
+Eval perf.: 2.8k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 1531 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A3 to A2
 
 Next player: Defender
@@ -196,12 +207,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1012 3:512 2:78 1:78 0:12 
-Eval perf.: 3.4k/s 
+Eval perf.: 2.9k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 1692 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Moved from A1 to A2
 
 Next player: Attacker
@@ -213,12 +225,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1061 3:537 2:83 1:83 0:13 
-Eval perf.: 3.4k/s 
+Eval perf.: 2.9k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 1777 
 Cumulative % evals per depth: 4:59.7% 3:30.2% 2:4.7% 1:4.7% 0:0.7% 
+Average branching factor: 5.3 
 Moved from D3 to C3
 
 Next player: Defender
@@ -230,12 +243,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .  aF9  .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1158 3:586 2:90 1:90 0:14 
-Eval perf.: 3.3k/s 
-Elapsed time: 0.1s 
+Eval perf.: 2.9k/s 
+Elapsed time: 0.0s 
 Cumulative evaluations: 1938 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Moved from A2 to A3
 
 Next player: Attacker
@@ -247,12 +261,13 @@ B: dT9 dP9 dF9  .   .
 C: dF9  .   .  aF9  .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1255 3:635 2:97 1:97 0:15 
-Eval perf.: 3.4k/s 
+Eval perf.: 2.9k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 2099 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Moved from C3 to B3
 
 Next player: Defender
@@ -264,12 +279,13 @@ B: dT9 dP9 dF9 aF9  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1326 3:671 2:103 1:103 0:16 
-Eval perf.: 3.4k/s 
+Eval perf.: 3.0k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 2219 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A3 to B3
 
 Next player: Attacker
@@ -281,12 +297,13 @@ B: dT9 dP9 dF9 aF8  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1423 3:720 2:110 1:110 0:17 
-Eval perf.: 3.4k/s 
+Eval perf.: 3.0k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 2380 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from B3 to A3
 
 Next player: Defender
@@ -298,12 +315,13 @@ B: dT9 dP9 dF9 aF7  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1494 3:756 2:116 1:116 0:18 
-Eval perf.: 3.4k/s 
+Eval perf.: 3.0k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 2500 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A3 to B3
 
 Next player: Attacker
@@ -315,12 +333,13 @@ B: dT9 dP9 dF9 aF6  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1591 3:805 2:123 1:123 0:19 
-Eval perf.: 3.4k/s 
-Elapsed time: 0.1s 
+Eval perf.: 3.1k/s 
+Elapsed time: 0.0s 
 Cumulative evaluations: 2661 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from B3 to A3
 
 Next player: Defender
@@ -332,12 +351,13 @@ B: dT9 dP9 dF9 aF5  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1662 3:841 2:129 1:129 0:20 
-Eval perf.: 3.4k/s 
+Eval perf.: 3.1k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 2781 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A3 to B3
 
 Next player: Attacker
@@ -349,12 +369,13 @@ B: dT9 dP9 dF9 aF4  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1759 3:890 2:136 1:136 0:21 
-Eval perf.: 3.4k/s 
+Eval perf.: 3.1k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 2942 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from B3 to A3
 
 Next player: Defender
@@ -366,12 +387,13 @@ B: dT9 dP9 dF9 aF3  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1830 3:926 2:142 1:142 0:22 
-Eval perf.: 3.4k/s 
+Eval perf.: 3.1k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 3062 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A3 to B3
 
 Next player: Attacker
@@ -383,12 +405,13 @@ B: dT9 dP9 dF9 aF2  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1927 3:975 2:149 1:149 0:23 
-Eval perf.: 3.4k/s 
-Elapsed time: 0.0s 
+Eval perf.: 3.1k/s 
+Elapsed time: 0.1s 
 Cumulative evaluations: 3223 
 Cumulative % evals per depth: 4:59.8% 3:30.3% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from B3 to A3
 
 Next player: Defender
@@ -400,12 +423,13 @@ B: dT9 dP9 dF9 aF1  .
 C: dF9  .   .   .   .  
 D:  .   .   .   .  aV9 
 E:  .   .  aP9 aV9 aA9 
-Heuristic score: 0 
+Heuristic score: 10011 
 Evals per depth: 4:1998 3:1011 2:155 1:155 0:24 
-Eval perf.: 3.4k/s 
+Eval perf.: 3.1k/s 
 Elapsed time: 0.0s 
 Cumulative evaluations: 3343 
 Cumulative % evals per depth: 4:59.8% 3:30.2% 2:4.6% 1:4.6% 0:0.7% 
+Average branching factor: 5.3 
 Attacked from A3 to B3
 
 Next player: Attacker

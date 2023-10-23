@@ -623,6 +623,12 @@ class Game:
         for k in sorted(self.stats.evaluations_per_depth.keys()):
             print(f"{self.options.max_depth - k}:{self.stats.evaluations_per_depth[k]/total_evals*100:0.1f}% ", end='')
         print()
+        branching = 0.0
+        for k in sorted(self.stats.evaluations_per_depth.keys()):
+            branching += self.stats.evaluations_per_depth[k]/self.stats.evaluations_per_depth[k+1]
+            if k == len(self.stats.evaluations_per_depth) - 2:
+                break
+        print(f"Average branching factor: {branching/(self.options.max_depth - 1):0.1f}")
 
         with open('gameTrace-b-t-100.txt', 'a') as f:
             f.write(f"Heuristic score: {score} \n")
@@ -639,7 +645,8 @@ class Game:
             for k in sorted(self.stats.evaluations_per_depth.keys()):
                 f.write(f"{self.options.max_depth - k}:{self.stats.evaluations_per_depth[k]/total_evals*100:0.1f}% ")
             f.write("\n")
-            
+            f.write(f"Average branching factor: {branching/(self.options.max_depth - 1):0.1f} \n")
+
         return move
 
     def minimax_alpha_beta(self, depth, maximizing_player, alpha, beta) -> tuple[float, CoordPair |
