@@ -345,7 +345,6 @@ class Game:
 
         # Check if there is a unit at the source coordinate
         src_unit = self.get(coords.src)
-
         if src_unit is None or src_unit.player != self.next_player:
             return False
 
@@ -364,12 +363,19 @@ class Game:
         # Check movement restrictions for AI, Firewall, and Program
         if src_unit.type in [UnitType.AI, UnitType.Firewall, UnitType.Program]:
             if src_unit.player == Player.Attacker:
-                return coords.src.row >= coords.dst.row and coords.src.col >= coords.dst.col
+                if not (coords.src.row >= coords.dst.row and coords.src.col >= coords.dst.col):
+                    return False
             else:  # Defender
-                return coords.src.row <= coords.dst.row and coords.src.col <= coords.dst.col
+                if not (coords.src.row <= coords.dst.row and coords.src.col <= coords.dst.col):
+                    return False
 
-        # Tech and Virus can move to adjacent cells
-        return coords.src.row != coords.dst.row or coords.src.col != coords.dst.col
+        # Check for single step movement without diagonal
+        row_diff = abs(coords.src.row - coords.dst.row)
+        col_diff = abs(coords.src.col - coords.dst.col)
+        if (row_diff == 1 and col_diff == 0) or (row_diff == 0 and col_diff == 1):
+            return True
+
+        return False
 
     def perform_move(self, coords: CoordPair) -> Tuple[bool, str]:
         """Validate and perform a move expressed as a CoordPair."""
@@ -467,13 +473,13 @@ class Game:
 
     def is_game_over(self) -> Tuple[bool, str]:
         if not self._attacker_has_ai:
-            return (True, "Game over! Defender wins!")
+            return (True, f"Game over! Defender wins in {self.turns_played} turns!")
         if not self._defender_has_ai:
-            return (True, "Game over! Attacker wins!")
+            return (True, f"Game over! Attacker wins in {self.turns_played} turns!")
         if not self._attacker_has_ai and not self._defender_has_ai:
-            return (True, "Game over! Defender wins!")
+            return (True, f"Game over! Defender wins in {self.turns_played} turns!")
         if not self._defender_has_ai:
-            return (True, "Game over! Attacker wins!")
+            return (True, f"Game over! Attacker wins in {self.turns_played} turns!")
         if self.turns_played >= 100:  # Assuming 100 as the limit
             return (True, "Game over! Defender wins due to move limit!")
         return (False, "")
@@ -622,10 +628,10 @@ class Game:
     def minimax_alpha_beta(self, depth, maximizing_player, alpha, beta) -> tuple[float, CoordPair |
         None, float]:
         nb_evals = 0
-        
+
         if depth == 0 or self.is_finished():
             # Calculate the heuristic score for this state
-            score = self.heuristic_e1(self.next_player)
+            score = self.heuristic_e0(self.next_player)
             current_nb_evals = self.stats.evaluations_per_depth.get(depth, 0)
             new_nb_evals = current_nb_evals + 1
             if depth not in self.stats.evaluations_per_depth:
@@ -826,10 +832,8 @@ class Game:
 
     # DEMO ONLY
     def heuristic_e0(self, player):
-        # Initialize counts for each unit type
         VPi = TPi = FPi = PPi = AIPi = 0
 
-        # Iterate through all units on the board
         for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
             unit = self.get(coord)
             if unit is not None and unit.player == player:
@@ -844,7 +848,6 @@ class Game:
                 elif unit.type == UnitType.AI:
                     AIPi += 1
 
-        # Calculate e0 using the formula
         e0 = (3 * VPi + 3 * TPi + 3 * FPi + 3 * PPi + 9999 * AIPi)
 
         return e0
@@ -867,17 +870,15 @@ class Game:
 
         # Calculate e1 using the difference in total health points
         e1 = total_health_player - total_health_opponent
-
+        print(f"Player {player} Health: {total_health_player}, Opponent Health: {total_health_opponent}")
         return e1
 
     # focus on the number of units on the board for each player,
     # encourages having more units on the board compared to the opponent
     def heuristic_e2(self, player):
-        # Initialize unit counts for each player
         unit_count_player = 0
         unit_count_opponent = 0
 
-        # Iterate through all units on the board
         for coord in CoordPair.from_dim(self.options.dim).iter_rectangle():
             unit = self.get(coord)
             if unit is not None:
@@ -886,9 +887,8 @@ class Game:
                 else:
                     unit_count_opponent += 1
 
-        # Calculate e2 using the difference in unit counts
         e2 = unit_count_player - unit_count_opponent
-
+        print(f"Player {player} Unit Count: {unit_count_player}, Opponent Unit Count: {unit_count_opponent}")
         return e2
 
     def get_valid_moves(self):
@@ -986,7 +986,7 @@ def main():
             winner = game.has_winner()
             if winner is not None:
                 f.write(f"Game over! {winner.name} wins in {game.turns_played} turns.")
-                print(f"Game over! {winner.name} wins!")
+                print(f"Game over! {winner.name} wins in {game.turns_played} turns!")
                 break
 
             if game.options.game_type == GameType.AttackerVsDefender:
