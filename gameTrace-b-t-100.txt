@@ -1,6 +1,3 @@
-GAME PARAMETERS 
-Max number of turns: 100 
-Play mode: manual 
 
 
 Next player: Attacker
@@ -23,3 +20,260 @@ B: dT9 dP9  .   .  aP9
 C: dF9  .   .   .   .  
 D:  .   .   .  aF9 aV9 
 E:  .   .  aP9 aV9 aA9 
+Moved from A2 to B2
+
+Next player: Attacker
+Turns played: 2
+
+    0   1   2   3   4  
+A: dA9 dT9  .   .   .  
+B: dT9 dP9 dF9  .  aP9 
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Moved from B4 to A4
+
+Next player: Defender
+Turns played: 3
+
+    0   1   2   3   4  
+A: dA9 dT9  .   .  aP9 
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Moved from A1 to A2
+
+Next player: Attacker
+Turns played: 4
+
+    0   1   2   3   4  
+A: dA9  .  dT9  .  aP9 
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Moved from A4 to A3
+
+Next player: Defender
+Turns played: 5
+
+    0   1   2   3   4  
+A: dA9  .  dT9 aP9  .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Moved from A0 to A1
+
+Next player: Attacker
+Turns played: 6
+
+    0   1   2   3   4  
+A:  .  dA9 dT9 aP9  .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A3 to A2
+
+Next player: Defender
+Turns played: 7
+
+    0   1   2   3   4  
+A:  .  dA9 dT6 aP6  .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A2 to A3
+
+Next player: Attacker
+Turns played: 8
+
+    0   1   2   3   4  
+A:  .  dA9 dT5 aP5  .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A3 to A2
+
+Next player: Defender
+Turns played: 9
+
+    0   1   2   3   4  
+A:  .  dA9 dT2 aP2  .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A2 to A3
+
+Next player: Attacker
+Turns played: 10
+
+    0   1   2   3   4  
+A:  .  dA9 dT1 aP1  .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A3 to A2
+
+Next player: Defender
+Turns played: 11
+
+    0   1   2   3   4  
+A:  .  dA9  .   .   .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Moved from A1 to A2
+
+Next player: Attacker
+Turns played: 12
+
+    0   1   2   3   4  
+A:  .   .  dA9  .   .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .  aF9 aV9 
+E:  .   .  aP9 aV9 aA9 
+Moved from D3 to C3
+
+Next player: Defender
+Turns played: 13
+
+    0   1   2   3   4  
+A:  .   .  dA9  .   .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .  aF9  .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Moved from A2 to A3
+
+Next player: Attacker
+Turns played: 14
+
+    0   1   2   3   4  
+A:  .   .   .  dA9  .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .  aF9  .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Moved from C3 to B3
+
+Next player: Defender
+Turns played: 15
+
+    0   1   2   3   4  
+A:  .   .   .  dA9  .  
+B: dT9 dP9 dF9 aF9  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A3 to B3
+
+Next player: Attacker
+Turns played: 16
+
+    0   1   2   3   4  
+A:  .   .   .  dA8  .  
+B: dT9 dP9 dF9 aF8  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from B3 to A3
+
+Next player: Defender
+Turns played: 17
+
+    0   1   2   3   4  
+A:  .   .   .  dA7  .  
+B: dT9 dP9 dF9 aF7  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A3 to B3
+
+Next player: Attacker
+Turns played: 18
+
+    0   1   2   3   4  
+A:  .   .   .  dA6  .  
+B: dT9 dP9 dF9 aF6  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from B3 to A3
+
+Next player: Defender
+Turns played: 19
+
+    0   1   2   3   4  
+A:  .   .   .  dA5  .  
+B: dT9 dP9 dF9 aF5  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A3 to B3
+
+Next player: Attacker
+Turns played: 20
+
+    0   1   2   3   4  
+A:  .   .   .  dA4  .  
+B: dT9 dP9 dF9 aF4  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from B3 to A3
+
+Next player: Defender
+Turns played: 21
+
+    0   1   2   3   4  
+A:  .   .   .  dA3  .  
+B: dT9 dP9 dF9 aF3  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A3 to B3
+
+Next player: Attacker
+Turns played: 22
+
+    0   1   2   3   4  
+A:  .   .   .  dA2  .  
+B: dT9 dP9 dF9 aF2  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from B3 to A3
+
+Next player: Defender
+Turns played: 23
+
+    0   1   2   3   4  
+A:  .   .   .  dA1  .  
+B: dT9 dP9 dF9 aF1  .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+Attacked from A3 to B3
+
+Next player: Attacker
+Turns played: 24
+
+    0   1   2   3   4  
+A:  .   .   .   .   .  
+B: dT9 dP9 dF9  .   .  
+C: dF9  .   .   .   .  
+D:  .   .   .   .  aV9 
+E:  .   .  aP9 aV9 aA9 
+GAME PARAMETERS 
+Max number of turns: 100 
+Play mode: auto 
+Game over! Attacker wins in 24 turns.

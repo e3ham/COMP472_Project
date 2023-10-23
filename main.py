@@ -586,8 +586,17 @@ class Game:
             # Iterate through all adjacent cells
             for dst in src.iter_adjacent():
                 move.dst = dst
+                src_unit = self.get(src)
+                dst_unit = self.get(dst)
+
                 if self.is_valid_move(move):
                     yield move.clone()
+                elif src_unit is not None and dst_unit is not None:
+                    if src_unit.player != dst_unit.player:
+                        yield move.clone()
+                elif src_unit is not None and dst_unit is not None:
+                    if src_unit.player == dst_unit.player:
+                        yield move.clone()
 
     def suggest_move(self) -> CoordPair | None:
         start_time = datetime.now()
