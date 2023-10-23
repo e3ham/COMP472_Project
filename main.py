@@ -623,6 +623,23 @@ class Game:
         for k in sorted(self.stats.evaluations_per_depth.keys()):
             print(f"{self.options.max_depth - k}:{self.stats.evaluations_per_depth[k]/total_evals*100:0.1f}% ", end='')
         print()
+
+        with open('gameTrace-b-t-100.txt', 'a') as f:
+            f.write(f"Heuristic score: {score} \n")
+            f.write(f"Evals per depth: ")
+            for k in sorted(self.stats.evaluations_per_depth.keys()):
+                f.write(f"{self.options.max_depth - k}:{self.stats.evaluations_per_depth[k]} ")
+            f.write("\n")
+            total_evals = sum(self.stats.evaluations_per_depth.values())
+            if self.stats.total_seconds > 0:
+                f.write(f"Eval perf.: {total_evals / self.stats.total_seconds / 1000:0.1f}k/s \n")
+            f.write(f"Elapsed time: {elapsed_seconds:0.1f}s \n")
+            f.write(f"Cumulative evaluations: {total_evals} \n")
+            f.write(f"Cumulative % evals per depth: ")
+            for k in sorted(self.stats.evaluations_per_depth.keys()):
+                f.write(f"{self.options.max_depth - k}:{self.stats.evaluations_per_depth[k]/total_evals*100:0.1f}% ")
+            f.write("\n")
+            
         return move
 
     def minimax_alpha_beta(self, depth, maximizing_player, alpha, beta) -> tuple[float, CoordPair |
