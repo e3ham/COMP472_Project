@@ -275,6 +275,7 @@ class Game:
     stats: Stats = field(default_factory=Stats)
     _attacker_has_ai: bool = True
     _defender_has_ai: bool = True
+    cumulative_evals = 0
 
     def __post_init__(self):
         """Automatically called after class init to set up the default board state."""
@@ -590,26 +591,38 @@ class Game:
 
     def suggest_move(self) -> CoordPair | None:
         start_time = datetime.now()
-        score, move, avg_depth = self.minimax_alpha_beta(self.options.max_depth, True, float('-inf'), float('inf'))
+        score, move, nb_evals = self.minimax_alpha_beta(self.options.max_depth, True, float('-inf'), float('inf'))
         elapsed_seconds = (datetime.now() - start_time).total_seconds()
         self.stats.total_seconds += elapsed_seconds
         print(f"Heuristic score: {score}")
-        print(f"Average recursive depth: {avg_depth:0.1f}")
         print(f"Evals per depth: ", end='')
         for k in sorted(self.stats.evaluations_per_depth.keys()):
-            print(f"{k}:{self.stats.evaluations_per_depth[k]} ", end='')
+            print(f"{self.options.max_depth - k}:{self.stats.evaluations_per_depth[k]} ", end='')
         print()
         total_evals = sum(self.stats.evaluations_per_depth.values())
         if self.stats.total_seconds > 0:
             print(f"Eval perf.: {total_evals / self.stats.total_seconds / 1000:0.1f}k/s")
         print(f"Elapsed time: {elapsed_seconds:0.1f}s")
+        print(f"Cumulative evaluations: {total_evals}")
+        print(f"Cumulative % evals per depth: ", end='')
+        for k in sorted(self.stats.evaluations_per_depth.keys()):
+            print(f"{self.options.max_depth - k}:{self.stats.evaluations_per_depth[k]/total_evals*100:0.1f}% ", end='')
+        print()
         return move
 
-    def minimax_alpha_beta(self, depth, maximizing_player, alpha, beta) -> tuple[float | Any, CoordPair |
+    def minimax_alpha_beta(self, depth, maximizing_player, alpha, beta) -> tuple[float, CoordPair |
         None, float]:
+        nb_evals = 0
+        
         if depth == 0 or self.is_finished():
             # Calculate the heuristic score for this state
-            score = self.heuristic_e2(self.next_player)
+            score = self.heuristic_e1(self.next_player)
+            current_nb_evals = self.stats.evaluations_per_depth.get(depth, 0)
+            new_nb_evals = current_nb_evals + 1
+            if depth not in self.stats.evaluations_per_depth:
+                self.stats.evaluations_per_depth[depth] = 0
+            self.stats.evaluations_per_depth[depth] = new_nb_evals
+
             return score, None, depth
 
         if maximizing_player:
@@ -625,6 +638,11 @@ class Game:
                 if evaluate > alpha:
                     alpha = evaluate
                     best_move = move
+                    current_nb_evals = self.stats.evaluations_per_depth.get(depth, 0)
+                    new_nb_evals = current_nb_evals + 1
+                    if depth not in self.stats.evaluations_per_depth:
+                        self.stats.evaluations_per_depth[depth] = 0
+                    self.stats.evaluations_per_depth[depth] = new_nb_evals
 
                 if beta <= alpha:
                     break  # Pruning
@@ -643,6 +661,11 @@ class Game:
                 if evaluate < beta:
                     beta = evaluate
                     best_move = move
+                    current_nb_evals = self.stats.evaluations_per_depth.get(depth, 0)
+                    new_nb_evals = current_nb_evals + 1
+                    if depth not in self.stats.evaluations_per_depth:
+                        self.stats.evaluations_per_depth[depth] = 0
+                    self.stats.evaluations_per_depth[depth] = new_nb_evals
 
                 if beta <= alpha:
                     break  # Pruning
