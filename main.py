@@ -14,7 +14,7 @@ MAX_HEURISTIC_SCORE = 2000000000
 MIN_HEURISTIC_SCORE = -2000000000
 
 # create the output file
-with open('gameTrace-b-t-50.txt', 'w') as f:
+with open('gameTrace-b-t-100.txt', 'w') as f:
     f.write("")
 
 
@@ -380,7 +380,7 @@ class Game:
             print(f"Move from {coords.src} to {coords.dst} is valid")
             self.set(coords.dst, self.get(coords.src))
             self.set(coords.src, None)
-            with open('gameTrace-b-t-50.txt', 'a') as f:
+            with open('gameTrace-b-t-100.txt', 'a') as f:
                 f.write(f"Moved from {coords.src} to {coords.dst}")
             return (True, f"Moved from {coords.src} to {coords.dst}")
 
@@ -397,7 +397,7 @@ class Game:
             affected_units = self.self_destruct(coords.src)
             if affected_units and src_unit.player == self.next_player:
                 affected_units_str = ', '.join([str(coord) for coord in affected_units])
-                with open('gameTrace-b-t-50.txt', 'a') as f:
+                with open('gameTrace-b-t-100.txt', 'a') as f:
                     f.write(f"Self-destructed at {coords.src}. Affected units: {affected_units_str}")
                 return (True, f"Self-destructed at {coords.src}. Affected units: {affected_units_str}")
             return (False, "Self-destruction failed")  # Explicitly specifying the failure reason
@@ -407,7 +407,7 @@ class Game:
             print(f"Attempting to attack from {coords.src} to {coords.dst}")
             success, message = self.attack(coords.src, coords.dst)
             if success:
-                with open('gameTrace-b-t-50.txt', 'a') as f:
+                with open('gameTrace-b-t-100.txt', 'a') as f:
                     f.write(f"Attacked from {coords.src} to {coords.dst}")
                 return (True, f"Attacked from {coords.src} to {coords.dst}")
             return (False, message)  # Explicitly returning the error from attack method
@@ -417,7 +417,7 @@ class Game:
             print(f"Attempting to repair {coords.dst} using {coords.src}")
             success, message = self.repair(coords.src, coords.dst)
             if success:
-                with open('gameTrace-b-t-50.txt', 'a') as f:
+                with open('gameTrace-b-t-100.txt', 'a') as f:
                     f.write(f"Repaired {coords.dst} using {coords.src}")
                 return (True, f"Repaired {coords.dst} using {coords.src}")
             return (False, message)  # Explicitly returning the error from repair method
@@ -454,7 +454,7 @@ class Game:
                 else:
                     output += f"{str(unit):^3} "
             output += "\n"
-        with open('gameTrace-b-t-50.txt', 'a') as f:
+        with open('gameTrace-b-t-100.txt', 'a') as f:
             f.write("\n")
             f.write("\n")
             f.write(f"{output}")
@@ -893,64 +893,6 @@ class Game:
         self.set(move.src, self.get(move.dst))
         self.set(move.dst, None)
 
-    def minimax(self, depth, maximizing_player, alpha=float('-inf'), beta=float('inf')):
-        best_move = None  # Store the best move found
-
-        if depth == 0 or self.is_finished():
-            return (self.heuristic_e0(self.next_player), None)
-
-        valid_moves = self.get_valid_moves()
-
-        if maximizing_player:
-            max_eval = float('-inf')
-            for move_tuple in valid_moves:
-                src_coord, dst_coord, action_str = move_tuple  # Extract source, destination coordinates, and action
-                move_to_perform = CoordPair(src_coord, dst_coord)  # Create a CoordPair from src and dst
-                prev_src_unit = self.get(move_to_perform.src)  # Get the unit at the source
-                prev_dst_unit = self.get(move_to_perform.dst)  # Get the unit at the destination
-
-                # Make the move
-                self.perform_move(move_to_perform)
-
-                evaluate, _ = self.minimax(depth - 1, False, alpha, beta)  # Recurse with the new state
-
-                # Undo the move by restoring the previous units
-                self.set(move_to_perform.src, prev_src_unit)
-                self.set(move_to_perform.dst, prev_dst_unit)
-
-                if evaluate > max_eval:
-                    max_eval = evaluate
-                    best_move = move_to_perform
-                alpha = max(alpha, evaluate)
-                if beta <= alpha:
-                    break
-            return max_eval, best_move
-        else:
-            min_eval = float('inf')
-            for move_tuple in valid_moves:
-                src_coord, dst_coord, action_str = move_tuple  # Extract source, destination coordinates, and action
-                move_to_perform = CoordPair(src_coord, dst_coord)  # Create a CoordPair from src and dst
-                prev_src_unit = self.get(move_to_perform.src)  # Get the unit at the source
-                prev_dst_unit = self.get(move_to_perform.dst)  # Get the unit at the destination
-
-                # Make the move
-                self.perform_move(move_to_perform)
-
-                evaluate, _ = self.minimax(depth - 1, True, alpha, beta)  # Recurse with the new state
-
-                # Undo the move by restoring the previous units
-                self.set(move_to_perform.src, prev_src_unit)
-                self.set(move_to_perform.dst, prev_dst_unit)
-
-                if evaluate < min_eval:
-                    min_eval = evaluate
-                    best_move = move_to_perform
-                beta = min(beta, evaluate)
-                if beta <= alpha:
-                    break
-            return min_eval, best_move
-
-
 ##############################################################################################################
 
 def main():
@@ -1001,7 +943,7 @@ def main():
     # create a new game
     game = Game(options=options)
 
-    with open('gameTrace-b-t-50.txt', 'a') as f:
+    with open('gameTrace-b-t-100.txt', 'a') as f:
         f.write("GAME PARAMETERS \n")
         f.write(f"Max number of turns: {game.options.max_turns} \n")
         f.write(f"Play mode: {game_type_input} \n")
