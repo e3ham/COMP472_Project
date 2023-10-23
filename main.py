@@ -1000,9 +1000,11 @@ def main():
     game = Game(options=options)
 
     with open('gameTrace-b-t-100.txt', 'a') as f:
+        f.write("\n")
         f.write("GAME PARAMETERS \n")
         f.write(f"Max number of turns: {game.options.max_turns} \n")
         f.write(f"Play mode: {game_type_input} \n")
+        f.write("\n")
 
         # the main game loop
         while True:
